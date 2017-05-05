@@ -1,0 +1,12 @@
+{
+    "name": "discord-bot-sandbox",
+    "description": "Discord Bot Sandbox",
+    "version": "0.0.1",
+    "author": {
+        "name": "Nguyen Phi Long",
+        "email": "Zeka304@gmail.com"
+    },
+    "dependencies": {
+        "discord.js": "~11.1.0"
+    }
+}
