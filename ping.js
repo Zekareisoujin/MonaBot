@@ -3,16 +3,20 @@
 */
 
 // Import the discord.js module
-const Discord = require('discord.js');
+const Discord = require('discord.js-commando');
 
 // Create an instance of a Discord client
 const client = new Discord.Client();
 
-// File reader to read app token
-const fs = require('fs');
-
-// // The token of your bot - https://discordapp.com/developers/applications/me
-// const token = '';
+let auth
+try {
+  auth = require('./auth.json')
+} catch (err) {
+  auth = {
+    token: process.env['TOKEN'],
+    admins: (process.env['ADMINS'] || '').split(',')
+  }
+}
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -26,13 +30,8 @@ client.on('message', message => {
     if (message.content === 'ping') {
         // Send "pong" to the same channel
         message.channel.send('pong');
+        console.log(message.author);
     }
 });
 
-fs.readFile('token', (err, data) => {
-    if (err) throw err;
-    var token = (new String(data)).toString();
-
-    // Log our bot in
-    client.login(token);
-});
+client.login(auth.token);
