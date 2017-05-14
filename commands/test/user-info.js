@@ -35,9 +35,11 @@ module.exports = class UserCommand extends commando.Command {
         const embed = new RichEmbed()
             .setAuthor(user.username)
             .setThumbnail(user.avatarURL)
-            .addField('Joined date', new Date(member.joinedTimestamp));
+            .addField('ID', user.id)
+            .addField('Nickname', member.nickname ? member.nickname : 'None')
+            .addField('Register date', user.createdAt)
+            .addField('Join date', member.joinedAt);
         
-        if (member.nickname) embed.addField('Nick name', member.nickname);
         return msg.channel.send({embed});
     }
 }
