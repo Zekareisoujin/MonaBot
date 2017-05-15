@@ -16,7 +16,7 @@ module.exports = class EventCalendarDB {
     }
 
     async createEvent(content, tag, guild, startTime) {
-        return await this.db.run('INSERT INTO events (content, tag, guild, start_time) VALUES (?,?)', [
+        return await this.db.run('INSERT INTO events (content, tag, guild, start_time) VALUES (?,?,?,?)', [
             content,
             tag,
             guild,
@@ -25,7 +25,7 @@ module.exports = class EventCalendarDB {
     }
 
     async createEvent(content, tag, guild, startTime, endTime) {
-        return await this.db.run('INSERT INTO events (content, tag, guild, start_time, end_time) VALUES (?,?,?)', [
+        return await this.db.run('INSERT INTO events (content, tag, guild, start_time, end_time) VALUES (?,?,?,?,?)', [
             content,
             tag,
             guild,
@@ -45,10 +45,11 @@ module.exports = class EventCalendarDB {
     }
 
     async fetchOngoingEvents(tag, guild) {
-        return await this.db.all('SELECT * FROM events\
-            WHERE end_time > datetime("now") \
+        return await this.db.all('SELECT * FROM events \
+            WHERE start_time <= datetime("now") \
+            AND end_time > datetime("now") \
             AND tag = ? AND guild = ? \
-        '[
+        ', [
             tag,
             guild
         ]);

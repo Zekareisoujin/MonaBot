@@ -1,9 +1,9 @@
 const commando = require('discord.js-commando');
 const RichEmbed = require('discord.js').RichEmbed;
 
-const argKey = 'user-info';
+const argKey = 'user';
 
-module.exports = class UserCommand extends commando.Command {
+module.exports = class UserInfoCommand extends commando.Command {
     constructor(client) {
         super(client, {
             'name': 'user-info',
@@ -11,7 +11,7 @@ module.exports = class UserCommand extends commando.Command {
                 'user',
                 'u'
             ],
-            'group': 'test',
+            'group': 'moderation',
             'memberName': 'user-info',
             'description': 'Display user info.',
             'example': [
@@ -27,6 +27,12 @@ module.exports = class UserCommand extends commando.Command {
                 }
             ]
         });
+    }
+
+    hasPermission(msg) {
+        if (!msg.guild)
+            return this.client.isOwner(msg.author);
+        return msg.member.hasPermission('ADMINISTRATOR');
     }
 
     async run(msg, args) {

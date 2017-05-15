@@ -2,6 +2,8 @@ const commando = require('discord.js-commando');
 const sqlite = require('sqlite');
 const path = require('path');
 const oneLine = require('common-tags').oneLine;
+const EventCalendarDB = require('./src/calendar/EventCalendarDB.js');
+const EventCalendar = require('./src/calendar/EventCalendar.js');
 
 let auth
 try {
@@ -58,13 +60,23 @@ client
 		`);
     });
 
-client.setProvider(
-    sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
-).catch(console.error);
+// client.setProvider(
+//     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
+// ).catch(console.error);
+
+sqlite.open(path.join(__dirname, 'evtcld.sqlite3'))
+    .then((db) => {
+        eventCalendarDB = new EventCalendarDB(db);
+        eventCalendar = new EventCalendar(eventCalendarDB);
+        client.EventCalendar = eventCalendar;
+        client.setProvider(new commando.SQLiteProvider(db))
+    })
+    .catch(console.error);
 
 client.registry
-    .registerGroup('test', 'Test')
+    .registerGroup('moderation', 'Moderation')
+    .registerGroup('calendar', 'Calendar')
     .registerDefaults()
-    .registerCommandsIn(path.join(__dirname, 'commands'));
+    .registerCommandsIn(path.join(__dirname, 'src/commands'));
 
 client.login(auth.token);
