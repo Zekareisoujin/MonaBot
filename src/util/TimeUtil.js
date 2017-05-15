@@ -28,9 +28,9 @@ module.exports = class TimeUtil {
         ['day', 'hour', 'minute', 'second'].forEach((denominator) => {
             if (diff.get(denominator) > 0)
                 ret.push(util.format(
-                    '%d %s(s)',
+                    '%d%s',
                     diff.get(denominator),
-                    denominator
+                    denominator.charAt(0)
                 ));
         })
         return ret.join(' ');

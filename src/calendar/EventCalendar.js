@@ -56,13 +56,14 @@ module.exports = class EventCalendar {
             db.fetchOngoingEvents(tag, guild)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
+            ret.push('ID - Content - Start Time - End Time');
             upcoming.concat(ongoing).forEach((event) => {
                 ret.push(util.format(
                     "%s - %s - %s - %s",
                     event.id,
                     event.content,
                     event.start_time,
-                    event.end_time
+                    (event.end_time ? event.end_time : 'indefinitely')
                 ));
             });
 

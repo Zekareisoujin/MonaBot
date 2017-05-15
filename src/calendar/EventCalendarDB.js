@@ -54,4 +54,8 @@ module.exports = class EventCalendarDB {
             guild
         ]);
     }
+
+    async deleteEvent(id) {
+        return await this.db.run('DELETE FROM events WHERE id = ?', [id]);
+    }
 }
