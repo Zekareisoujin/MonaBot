@@ -11,6 +11,7 @@ module.exports = class TimeUtil {
      */
     static getTimeObject(timeString) {
         // return moment.tz(timeString, 'UTC');
+        if (!timeString) timeString = new Date();
         return moment.tz(new Date(timeString), 'UTC').format();
     }
 

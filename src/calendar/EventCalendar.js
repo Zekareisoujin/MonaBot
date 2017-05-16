@@ -27,6 +27,7 @@ module.exports = class EventCalendar {
         const db = this.db
         return await Promise.resolve()
             .then(() => {
+                // TODO: handle time error, or throw exception from time util
                 let startDateTime = TimeUtil.getTimeObject(startTime);
                 if (endTime && endTime.length > 0) {
                     let endDateTime = TimeUtil.getTimeObject(endTime);

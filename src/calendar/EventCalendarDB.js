@@ -1,3 +1,5 @@
+const TimeUtil = require('../util/TimeUtil.js');
+
 module.exports = class EventCalendarDB {
     constructor(db) {
         this.db = db;
@@ -43,20 +45,24 @@ module.exports = class EventCalendarDB {
 
     async fetchUpcomingEvents(tag, guild) {
         return await this.db.all('SELECT * FROM events \
-            WHERE start_time > datetime("now") \
+            WHERE start_time > ? \
             AND tag = ? AND guild = ? \
         ', [
+                TimeUtil.getTimeObject(),
                 tag,
                 guild
             ]);
     }
 
     async fetchOngoingEvents(tag, guild) {
+        let now = TimeUtil.getTimeObject();
         return await this.db.all('SELECT * FROM events \
-            WHERE start_time <= datetime("now") \
-            AND end_time > datetime("now") \
+            WHERE start_time <= ? \
+            AND end_time > ? \
             AND tag = ? AND guild = ? \
         ', [
+                now,
+                now,
                 tag,
                 guild
             ]);
