@@ -52,13 +52,13 @@ module.exports = class AddEvent extends commando.Command {
 
     hasPermission(msg) {
         const EventCalendar = this.client.EventCalendar;
-        return EventCalendar.hasModeratorPermission(msg);
+        return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }
 
     async run(msg, args) {
         const EventCalendar = this.client.EventCalendar;
         return msg.channel.send(await EventCalendar.createEvent(
-            args[argContent], 
+            args[argContent],
             args[argTag],
             msg.guild.id,
             args[argStart],

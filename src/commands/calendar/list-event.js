@@ -30,7 +30,7 @@ module.exports = class ListEvent extends commando.Command {
 
     hasPermission(msg) {
         const EventCalendar = this.client.EventCalendar;
-        return EventCalendar.hasModeratorPermission(msg);
+        return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }
 
     async run(msg, args) {

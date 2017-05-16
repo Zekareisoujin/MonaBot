@@ -4,7 +4,7 @@ module.exports = class EventCalendarDB {
     }
 
     async init() {
-        await this.db.run('CREATE TABLE IF NOT EXISTS events ( \
+        let eventPromise = this.db.run('CREATE TABLE IF NOT EXISTS events ( \
             id INTEGER PRIMARY KEY, \
             content TEXT NOT NULL, \
             tag TEXT, \
@@ -12,7 +12,14 @@ module.exports = class EventCalendarDB {
             start_time DATE NOT NULL, \
             end_time DATE \
         )');
-        return this;
+
+        let modPromise = this.db.run('CREATE TABLE IF NOT EXISTS moderators ( \
+            guild TEXT NOT NULL, \
+            role TEXT NOT NULL, \
+            PRIMARY KEY (guild, role) \
+        )');
+
+        return await Promise.all([eventPromise, modPromise]);
     }
 
     async createEvent(content, tag, guild, startTime) {
@@ -39,9 +46,9 @@ module.exports = class EventCalendarDB {
             WHERE start_time > datetime("now") \
             AND tag = ? AND guild = ? \
         ', [
-            tag,
-            guild
-        ]);
+                tag,
+                guild
+            ]);
     }
 
     async fetchOngoingEvents(tag, guild) {
@@ -50,12 +57,39 @@ module.exports = class EventCalendarDB {
             AND end_time > datetime("now") \
             AND tag = ? AND guild = ? \
         ', [
-            tag,
-            guild
-        ]);
+                tag,
+                guild
+            ]);
     }
 
     async deleteEvent(id) {
         return await this.db.run('DELETE FROM events WHERE id = ?', [id]);
+    }
+
+    async addModerator(guild, role) {
+        return await this.db.run('INSERT INTO moderators (guild, role) VALUES (?,?)', [
+            guild,
+            role
+        ]);
+    }
+
+    async listModerators(guild) {
+        return await this.db.all('SELECT * FROM moderators WHERE guild = ?', [
+            guild
+        ]);
+    }
+
+    // async checkModerator(guild, role) {
+    //     return await this.db.get('SELECT * FROM moderators WHERE guild = ? AND role = ?', [
+    //         guild,
+    //         role
+    //     ]);
+    // }
+
+    async removeModerator(guild, role) {
+        return await this.db.run('DELETE FROM moderators WHERE guild = ? AND role = ?', [
+            guild,
+            role
+        ]);
     }
 }

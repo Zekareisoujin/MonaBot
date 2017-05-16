@@ -11,28 +11,28 @@ module.exports = class EventCalendar {
         db.init().catch((err) => {
             console.error('Unable to initialize database', err);
             throw err;
-        })
+        });
     }
 
     /**
      * Create an event & add it to database
      * @param {string} content - event content/description
      * @param {string} tag - event tag/classification
-     * @param {string} guild - guild ID
+     * @param {string} guildId - guild ID
      * @param {string} startTime - event start time
      * @param {?string} endTime - event end time
      * @return promise that resolve into reply string containing result
      */
-    async createEvent(content, tag, guild, startTime, endTime) {
+    async createEvent(content, tag, guildId, startTime, endTime) {
         const db = this.db
         return await Promise.resolve()
             .then(() => {
                 let startDateTime = TimeUtil.getTimeObject(startTime);
                 if (endTime && endTime.length > 0) {
                     let endDateTime = TimeUtil.getTimeObject(endTime);
-                    return db.createEvent(content, tag, guild, startDateTime, endDateTime);
+                    return db.createEvent(content, tag, guildId, startDateTime, endDateTime);
                 } else
-                    return db.createEvent(content, tag, guild, startDateTime);
+                    return db.createEvent(content, tag, guildId, startDateTime);
             })
             .then(() => {
                 return "Event created successfully!"; //TODO: insert 👌
@@ -40,20 +40,20 @@ module.exports = class EventCalendar {
             .catch((err) => {
                 console.error(err);
                 return "Error while creating event: " + err;
-            })
+            });
     }
 
     /**
      * List all ongoing & upcoming events with ID
      * @param {string} tag - event tag/classification
-     * @param {string} guild - guild ID
+     * @param {string} guildId - guild ID
      * @return promise that resolve into formatted reply string listing all active events & their ID
      */
-    async listActiveEventsWithID(tag, guild) {
+    async listActiveEventsWithID(tag, guildId) {
         const db = this.db;
         return await Promise.all([
-            db.fetchUpcomingEvents(tag, guild),
-            db.fetchOngoingEvents(tag, guild)
+            db.fetchUpcomingEvents(tag, guildId),
+            db.fetchOngoingEvents(tag, guildId)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
             ret.push('ID - Content - Start Time - End Time');
@@ -71,20 +71,20 @@ module.exports = class EventCalendar {
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
-        })
+        });
     }
 
     /**
      * List all ongoing & upcoming events
      * @param {string} tag - event tag/classification
-     * @param {string} guild - guild ID
+     * @param {string} guildId - guild ID
      * @return promise that resolve into formatted reply string listing all active events
      */
-    async listActiveEvents(tag, guild) {
+    async listActiveEvents(tag, guildId) {
         const db = this.db;
         return await Promise.all([
-            db.fetchUpcomingEvents(tag, guild),
-            db.fetchOngoingEvents(tag, guild)
+            db.fetchUpcomingEvents(tag, guildId),
+            db.fetchOngoingEvents(tag, guildId)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
 
@@ -117,7 +117,7 @@ module.exports = class EventCalendar {
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
-        })
+        });
     }
 
     /**
@@ -136,6 +136,54 @@ module.exports = class EventCalendar {
             .catch((err) => {
                 console.error("Error while deleting event", err);
                 return "Failed to delete event: " + err;
+            });
+    }
+
+    async addModerator(guildId, roleId) {
+        const db = this.db;
+        return await Promise.resolve()
+            .then(() => {
+                return db.addModerator(guildId, roleId);
+            })
+            .then(() => {
+                return "Moderator role added successfully!";
+            })
+            .catch((err) => {
+                // TODO: catch duplicate mod addition
+                console.error("Error while adding moderator role", err);
+                return "Failed to add moderator role: " + err;
+            });
+    }
+
+    async listModerators(guild) {
+        const db = this.db;
+        return await Promise.resolve()
+            .then(() => {
+                return db.listModerators(guild.id);
+            })
+            .then((moderatorRoleList) => {
+                let ret = [];
+                moderatorRoleList.forEach((modRole) => ret.push(guild.roles.get(modRole.role).name));
+                return util.format('```%s```', ret.join(', '));
+            })
+            .catch((err) => {
+                console.error("Error while retrieving moderator role list", err);
+                return "Failed to list moderator roles: " + err;
+            });
+    }
+
+    async removeModerator(guildId, roleId) {
+        const db = this.db
+        return await Promise.resolve()
+            .then(() => {
+                return db.removeModerator(guildId, roleId);
+            })
+            .then(() => {
+                return "Moderator role successfully removed!";
+            })
+            .catch((err) => {
+                console.error("Error while removing moderator role", err);
+                return "Failed to remove moderator role: " + err;
             })
     }
 
@@ -143,10 +191,17 @@ module.exports = class EventCalendar {
      * Check permission for modifying events
      * @return {boolean}
      */
-    hasModeratorPermission(msg) {
-        if (!msg.guild)
+    async hasModeratorPermission(guild, member) {
+        if (!guild)
             return false;
 
-        return msg.member.hasPermission('ADMINISTRATOR') || msg.member.hasPermission('MANAGE_NICKNAMES');
+        let modRoleList = await this.db.listModerators(guild);
+        let hasPermission = false;
+        modRoleList.forEach((modRole) => {
+            if (member.roles.has(modRole.role.id))
+                hasPermission = true;
+        })
+
+        return member.hasPermission('ADMINISTRATOR') || hasPermission;
     }
 }
