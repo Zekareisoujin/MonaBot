@@ -46,7 +46,7 @@ module.exports = class EventCalendar {
 
     /**
      * List all ongoing & upcoming events with ID
-     * @param {string} tag - event tag/classification
+     * @param {string} tag - event tag/classification / TODO: make this param optional
      * @param {string} guildId - guild ID
      * @return promise that resolve into formatted reply string listing all active events & their ID
      */
@@ -57,16 +57,22 @@ module.exports = class EventCalendar {
             db.fetchOngoingEvents(tag, guildId)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
-            ret.push('ID - Content - Start Time - End Time');
-            upcoming.concat(ongoing).forEach((event) => {
-                ret.push(util.format(
-                    "%s - %s - %s - %s",
-                    event.id,
-                    event.content,
-                    event.start_time,
-                    (event.end_time ? event.end_time : 'indefinitely')
-                ));
-            });
+
+            if (upcoming.length > 0 && ongoing.length > 0) {
+                ret.push('ID - Content - Start Time - End Time');
+                upcoming.concat(ongoing).forEach((event) => {
+                    ret.push(util.format(
+                        "%s - %s - %s - %s",
+                        event.id,
+                        event.content,
+                        event.start_time,
+                        (event.end_time ? event.end_time : 'indefinitely')
+                    ));
+                });
+            }
+
+            if (ret.length == 0)
+                ret.push('There is no active event at the moment.');
 
             return util.format('```%s```', ret.join('\n'));
         }).catch((err) => {
