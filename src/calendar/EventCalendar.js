@@ -8,10 +8,18 @@ module.exports = class EventCalendar {
      */
     constructor(db) {
         this.db = db;
-        db.init().catch((err) => {
-            console.error('Unable to initialize database', err);
-            throw err;
-        });
+        this.moderatorRoles = new Set();
+        db.init()
+            .then(() => {
+                return db.listAllModerators();
+            })
+            .then((roleList) => {
+                roleList.forEach((role) => this.moderatorRoles.add(role.role));
+            })
+            .catch((err) => {
+                console.error('Unable to initialize database', err);
+                throw err;
+            });
     }
 
     /**
@@ -58,7 +66,7 @@ module.exports = class EventCalendar {
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
 
-            if (upcoming.length > 0 && ongoing.length > 0) {
+            if (upcoming.length > 0 || ongoing.length > 0) {
                 ret.push('ID - Content - Start Time - End Time');
                 upcoming.concat(ongoing).forEach((event) => {
                     ret.push(util.format(
@@ -153,6 +161,7 @@ module.exports = class EventCalendar {
                 return db.addModerator(guildId, roleId);
             })
             .then(() => {
+                this.moderatorRoles.add(roleId);
                 return "Moderator role added successfully!";
             })
             .catch((err) => {
@@ -186,6 +195,7 @@ module.exports = class EventCalendar {
                 return db.removeModerator(guildId, roleId);
             })
             .then(() => {
+                this.moderatorRoles.delete(roleId);
                 return "Moderator role successfully removed!";
             })
             .catch((err) => {
@@ -198,14 +208,14 @@ module.exports = class EventCalendar {
      * Check permission for modifying events
      * @return {boolean}
      */
-    async hasModeratorPermission(guild, member) {
+    hasModeratorPermission(guild, member) {
         if (!guild)
             return false;
 
-        let modRoleList = await this.db.listModerators(guild);
         let hasPermission = false;
-        modRoleList.forEach((modRole) => {
-            if (member.roles.has(modRole.role.id))
+        member.roles.forEach((role) => {
+            // console.log('Checking role: ' + role.id);
+            if (this.moderatorRoles.has(role.id))
                 hasPermission = true;
         })
 

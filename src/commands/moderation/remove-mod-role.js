@@ -30,7 +30,8 @@ module.exports = class RemoveModeratorRole extends commando.Command {
     
     hasPermission(msg) {
         if (!msg.guild)
-            return this.client.isOwner(msg.author);
+            // return this.client.isOwner(msg.author);
+            return false;
         return msg.member.hasPermission('ADMINISTRATOR');
     }
 

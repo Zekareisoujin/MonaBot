@@ -51,6 +51,9 @@ module.exports = class AddEvent extends commando.Command {
     }
 
     hasPermission(msg) {
+        if (!msg.guild)
+            return false;
+
         const EventCalendar = this.client.EventCalendar;
         return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }

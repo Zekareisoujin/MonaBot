@@ -30,6 +30,10 @@ module.exports = class ViewSchedule extends commando.Command {
         });
     }
 
+    hasPermission(msg) {
+        return msg.guild ? true : false;
+    }
+
     async run(msg, args) {
         const EventCalendar = this.client.EventCalendar;
         return msg.channel.send(await EventCalendar.listActiveEvents(

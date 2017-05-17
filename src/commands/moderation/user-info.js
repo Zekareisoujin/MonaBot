@@ -31,20 +31,23 @@ module.exports = class UserInfoCommand extends commando.Command {
 
     hasPermission(msg) {
         if (!msg.guild)
-            return this.client.isOwner(msg.author);
+            // return this.client.isOwner(msg.author);
+            return false;
         return msg.member.hasPermission('ADMINISTRATOR');
     }
 
     async run(msg, args) {
         const member = args[argKey];
         const user = member.user;
+        const EventCalendar = this.client.EventCalendar;
         const embed = new RichEmbed()
             .setAuthor(user.username)
             .setThumbnail(user.avatarURL)
             .addField('ID', user.id)
             .addField('Nickname', member.nickname ? member.nickname : 'None')
             .addField('Register date', user.createdAt)
-            .addField('Join date', member.joinedAt);
+            .addField('Join date', member.joinedAt)
+            .addField('Mod Permission', await EventCalendar.hasModeratorPermission(msg.guild, member));
         
         return msg.channel.send({embed});
     }

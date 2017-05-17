@@ -80,17 +80,14 @@ module.exports = class EventCalendarDB {
     }
 
     async listModerators(guild) {
-        return await this.db.all('SELECT * FROM moderators WHERE guild = ?', [
+        return await this.db.all('SELECT role FROM moderators WHERE guild = ?', [
             guild
         ]);
     }
 
-    // async checkModerator(guild, role) {
-    //     return await this.db.get('SELECT * FROM moderators WHERE guild = ? AND role = ?', [
-    //         guild,
-    //         role
-    //     ]);
-    // }
+    async listAllModerators() {
+        return await this.db.all('SELECT role FROM moderators');
+    }
 
     async removeModerator(guild, role) {
         return await this.db.run('DELETE FROM moderators WHERE guild = ? AND role = ?', [
