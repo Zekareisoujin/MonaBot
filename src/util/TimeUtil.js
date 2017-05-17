@@ -11,8 +11,11 @@ module.exports = class TimeUtil {
      */
     static getTimeObject(timeString) {
         // return moment.tz(timeString, 'UTC');
-        if (!timeString) timeString = new Date();
-        return moment.tz(new Date(timeString), 'UTC').format();
+        let datetime;
+        datetime = timeString ? new Date(timeString) : new Date();
+        if (datetime == 'Invalid Date')
+            throw datetime;
+        return moment.tz(datetime, 'UTC').format();
     }
 
     /**

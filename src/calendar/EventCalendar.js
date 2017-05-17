@@ -54,7 +54,7 @@ module.exports = class EventCalendar {
 
     /**
      * List all ongoing & upcoming events with ID
-     * @param {string} tag - event tag/classification / TODO: make this param optional
+     * @param {string} tag - event tag/classification
      * @param {string} guildId - guild ID
      * @return promise that resolve into formatted reply string listing all active events & their ID
      */
@@ -133,6 +133,29 @@ module.exports = class EventCalendar {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
         });
+    }
+
+    /**
+     * List all active event tags
+     * @return promise that resolve into reply string containing result
+     */
+    async listActiveEventTags(guildId) {
+        return await this.db.fetchActiveEventTags(guildId)
+            .then((tags) => {
+                let ret = [];
+                tags.forEach((tag) => {
+                    ret.push(tag.tag);
+                });
+
+                if (ret.length == 0)
+                    ret.push('There is no active event at the moment.');
+                
+                return util.format('```%s```', ret.join(', '));
+            })
+            .catch((err) => {
+                console.error("Error while retrieving event tags", err);
+                return "Failed to retrieve event tags: " + err;
+            })
     }
 
     /**

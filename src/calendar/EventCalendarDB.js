@@ -68,6 +68,20 @@ module.exports = class EventCalendarDB {
             ]);
     }
 
+    async fetchActiveEventTags(guild) {
+        let now = TimeUtil.getTimeObject();
+        console.log(now);
+        return await this.db.all('SELECT DISTINCT tag FROM events \
+            WHERE guild = ? \
+            AND (start_time > ? \
+            OR end_time > ?) \
+        ', [
+            guild,
+            now,
+            now
+        ]);
+    }
+
     async deleteEvent(id) {
         return await this.db.run('DELETE FROM events WHERE id = ?', [id]);
     }
