@@ -1,7 +1,11 @@
 {
   "name": "discord-bot-sandbox",
   "description": "Discord Bot Sandbox",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "engines": {
+      "node": ">=7.10.0",
+      "npm": ">=4.2.0"
+  },
   "author": {
     "name": "Nguyen Phi Long",
     "email": "Zeka304@gmail.com"
