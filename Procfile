@@ -1,1 +1,1 @@
-web: node ping.js
+web: node --harmony bot.js
