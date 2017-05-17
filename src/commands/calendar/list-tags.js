@@ -8,6 +8,7 @@ module.exports = class DeleteEvent extends commando.Command {
                 'tags',
                 'tag'
             ],
+            'guildOnly': true,
             'group': 'calendar',
             'memberName': 'list-tags',
             'description': 'List all active event tags.',
@@ -15,10 +16,6 @@ module.exports = class DeleteEvent extends commando.Command {
                 'tags'
             ],
         });
-    }
-
-    hasPermission(msg) {
-        return msg.guild ? true : false;
     }
 
     async run(msg, args) {

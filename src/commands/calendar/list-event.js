@@ -17,6 +17,7 @@ module.exports = class ListEvent extends commando.Command {
                 'list event',
                 'ls mp'
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argTag,
@@ -29,9 +30,6 @@ module.exports = class ListEvent extends commando.Command {
     }
 
     hasPermission(msg) {
-        if (!msg.guild)
-            return false;
-            
         const EventCalendar = this.client.EventCalendar;
         return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }

@@ -13,14 +13,12 @@ module.exports = class RemoveModeratorRole extends commando.Command {
             'example': [
                 'lsmod'
             ],
+            'guildOnly': true,
         });
     }
     
     hasPermission(msg) {
-        if (!msg.guild)
-            // return this.client.isOwner(msg.author);
-            return false;
-        return msg.member.hasPermission('ADMINISTRATOR');
+        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
     async run(msg, args) {

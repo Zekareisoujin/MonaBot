@@ -17,6 +17,7 @@ module.exports = class RemoveModeratorRole extends commando.Command {
                 'remmod @Helper',
                 'rmmod Helper'
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argRole,
@@ -29,10 +30,7 @@ module.exports = class RemoveModeratorRole extends commando.Command {
     }
     
     hasPermission(msg) {
-        if (!msg.guild)
-            // return this.client.isOwner(msg.author);
-            return false;
-        return msg.member.hasPermission('ADMINISTRATOR');
+        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
     async run(msg, args) {

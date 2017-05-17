@@ -19,6 +19,11 @@ module.exports = class ViewSchedule extends commando.Command {
                 'view event',
                 'sched mp',
             ],
+            'guildOnly': true,
+            'throttling': {
+                'usages': 3,
+                'duration': 10
+            },
             'args': [
                 {
                     'key': argTag,
@@ -28,10 +33,6 @@ module.exports = class ViewSchedule extends commando.Command {
                 }
             ]
         });
-    }
-
-    hasPermission(msg) {
-        return msg.guild ? true : false;
     }
 
     async run(msg, args) {

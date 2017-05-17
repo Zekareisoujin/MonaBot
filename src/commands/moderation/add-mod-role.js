@@ -15,6 +15,7 @@ module.exports = class AddModeratorRole extends commando.Command {
             'example': [
                 'addmod @Helper',
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argRole,
@@ -27,10 +28,7 @@ module.exports = class AddModeratorRole extends commando.Command {
     }
     
     hasPermission(msg) {
-        if (!msg.guild)
-            // return this.client.isOwner(msg.author);
-            return false;
-        return msg.member.hasPermission('ADMINISTRATOR');
+        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
     async run(msg, args) {

@@ -18,6 +18,7 @@ module.exports = class UserInfoCommand extends commando.Command {
                 'user Nad#4039',
                 'u Nad'
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argKey,
@@ -30,10 +31,7 @@ module.exports = class UserInfoCommand extends commando.Command {
     }
 
     hasPermission(msg) {
-        if (!msg.guild)
-            // return this.client.isOwner(msg.author);
-            return false;
-        return msg.member.hasPermission('ADMINISTRATOR');
+        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
     async run(msg, args) {

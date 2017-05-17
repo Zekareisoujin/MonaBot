@@ -20,6 +20,7 @@ module.exports = class AddEvent extends commando.Command {
                 'add event "Exploration 4 release" "2017-05-20 19:00:00 UTC-8"',
                 'a mp "Shiva Sicarius" "2017-05-20 19:00:00 UTC-8" "2017-05-27 18:59:59 UTC-8"'
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argTag,
@@ -51,9 +52,6 @@ module.exports = class AddEvent extends commando.Command {
     }
 
     hasPermission(msg) {
-        if (!msg.guild)
-            return false;
-
         const EventCalendar = this.client.EventCalendar;
         return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }

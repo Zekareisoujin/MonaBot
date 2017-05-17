@@ -17,6 +17,7 @@ module.exports = class DeleteEvent extends commando.Command {
                 'delete 1',
                 'del 2'
             ],
+            'guildOnly': true,
             'args': [
                 {
                     'key': argId,
@@ -28,10 +29,7 @@ module.exports = class DeleteEvent extends commando.Command {
         });
     }
 
-    hasPermission(msg) {
-        if (!msg.guild)
-            return false;
-            
+    hasPermission(msg) {        
         const EventCalendar = this.client.EventCalendar;
         return EventCalendar.hasModeratorPermission(msg.guild, msg.member);
     }
