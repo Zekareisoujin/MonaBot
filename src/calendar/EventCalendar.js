@@ -203,6 +203,10 @@ module.exports = class EventCalendar {
             .then((moderatorRoleList) => {
                 let ret = [];
                 moderatorRoleList.forEach((modRole) => ret.push(guild.roles.get(modRole.role).name));
+
+                if (ret.length == 0)
+                    ret.push('There is no moderator role for this server at the moment.');
+
                 return util.format('```%s```', ret.join(', '));
             })
             .catch((err) => {
