@@ -1,23 +1,25 @@
 const commando = require('discord.js-commando');
-const sqlite = require('sqlite');
 const path = require('path');
 const oneLine = require('common-tags').oneLine;
-const EventCalendarDB = require('./src/calendar/EventCalendarDB.js');
+const CalendarSequelize = require('./src/calendar/CalendarSequelize.js');
 const EventCalendar = require('./src/calendar/EventCalendar.js');
 
-let auth
+let config
 try {
-    auth = require('./auth.json')
+    config = require('./config.json')
 } catch (err) {
-    auth = {
-        token: process.env['TOKEN'],
-        admins: (process.env['ADMINS'] || '').split(',')
+    config = {
+        db: process.env['DATABASE_URL'],
+        auth: {
+            token: process.env['TOKEN'],
+            admins: (process.env['ADMINS'] || '').split(',')
+        }
     }
 }
 
 const client = new commando.Client({
-    'owner': auth.admins,
-    'commandPrefix': '.'
+    'owner': config.auth.admins,
+    'commandPrefix': '}'
 })
 
 client
@@ -64,14 +66,9 @@ client
 //     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
 // ).catch(console.error);
 
-sqlite.open(path.join(__dirname, 'evtcld.sqlite3'))
-    .then((db) => {
-        eventCalendarDB = new EventCalendarDB(db);
-        eventCalendar = new EventCalendar(eventCalendarDB);
-        client.EventCalendar = eventCalendar;
-        client.setProvider(new commando.SQLiteProvider(db))
-    })
-    .catch(console.error);
+db = new CalendarSequelize(config.db);
+eventCalendar = new EventCalendar(db);
+client.EventCalendar = eventCalendar;
 
 client.registry
     .registerGroup('moderation', 'Moderation')
@@ -79,4 +76,4 @@ client.registry
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'src/commands'));
 
-client.login(auth.token);
+client.login(config.auth.token);
