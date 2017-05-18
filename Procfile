@@ -1,1 +1,1 @@
-worker: node --harmony bot.js
+worker: npm start
