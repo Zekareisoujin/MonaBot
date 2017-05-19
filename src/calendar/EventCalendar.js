@@ -67,10 +67,10 @@ module.exports = class EventCalendar {
             let ret = [];
 
             if (upcoming.length > 0 || ongoing.length > 0) {
-                ret.push('ID - Content - Start Time - End Time');
+                ret.push('#ID. Content - Start Time - End Time');
                 upcoming.concat(ongoing).forEach((event) => {
                     ret.push(util.format(
-                        "%s - %s - %s - %s",
+                        "%d. %s - %s - %s",
                         event.id,
                         event.content,
                         event.start_time,
@@ -82,7 +82,7 @@ module.exports = class EventCalendar {
             if (ret.length == 0)
                 ret.push('There is no active event at the moment.');
 
-            return util.format('```%s```', ret.join('\n'));
+            return util.format('```Markdown\n%s```', ret.join('\n'));
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
@@ -104,21 +104,22 @@ module.exports = class EventCalendar {
             let ret = [];
 
             if (ongoing.length > 0) {
-                ret.push('*** Ongoing events ***');
+                ret.push('# Ongoing events');
                 ongoing.forEach((event) => {
                     ret.push(util.format(
-                        '%s - %s',
+                        '- %s < %s >',
                         event.content,
                         TimeUtil.getTimeDifference(event.end_time)
                     ));
                 });
+                ret.push('');
             }
 
             if (upcoming.length > 0) {
-                ret.push('*** Upcoming events ***');
+                ret.push('# Upcoming events');
                 upcoming.forEach((event) => {
                     ret.push(util.format(
-                        '%s - %s',
+                        '- %s < %s >',
                         event.content,
                         TimeUtil.getTimeDifference(event.start_time)
                     ));
@@ -128,7 +129,7 @@ module.exports = class EventCalendar {
             if (ret.length == 0)
                 ret.push('There is no active event under this tag.');
 
-            return util.format('```%s```', ret.join('\n'));
+            return util.format('```Markdown\n%s```', ret.join('\n'));
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
