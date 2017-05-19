@@ -19,7 +19,8 @@ try {
 
 const client = new commando.Client({
     'owner': config.auth.admins,
-    'commandPrefix': '}'
+    'commandPrefix': '$',
+    'unknownCommandResponse': false
 })
 
 client
