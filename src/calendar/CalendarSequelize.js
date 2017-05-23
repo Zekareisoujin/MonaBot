@@ -52,7 +52,8 @@ module.exports = class CalendarSequelize {
                 start_time: {
                     $gte: TimeUtil.getTimeObject()
                 }
-            }
+            },
+            order: ['start_time']
         });
     }
 
@@ -68,7 +69,8 @@ module.exports = class CalendarSequelize {
                 end_time: {
                     $gte: now
                 }
-            }
+            },
+            order: ['end_time']
         });
     }
 
