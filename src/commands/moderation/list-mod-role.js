@@ -23,6 +23,6 @@ module.exports = class RemoveModeratorRole extends commando.Command {
 
     async run(msg, args) {
         const EventCalendar = this.client.EventCalendar;
-        return msg.channel.send(await EventCalendar.listModerators(msg.guild));
+        return msg.channel.send(await EventCalendar.listModerators(msg.guild), { code: true });
     }
 }

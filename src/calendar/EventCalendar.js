@@ -82,7 +82,7 @@ module.exports = class EventCalendar {
             if (ret.length == 0)
                 ret.push('There is no active event at the moment.');
 
-            return util.format('```Markdown\n%s```', ret.join('\n'));
+            return ret.join('\n');
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
@@ -129,7 +129,7 @@ module.exports = class EventCalendar {
             if (ret.length == 0)
                 ret.push('There is no active event under this tag.');
 
-            return util.format('```Markdown\n%s```', ret.join('\n'));
+            return ret.join('\n');
         }).catch((err) => {
             console.error("Error while retrieving events", err);
             return "Failed to retrieve events: " + err;
@@ -151,7 +151,7 @@ module.exports = class EventCalendar {
                 if (ret.length == 0)
                     ret.push('There is no active event at the moment.');
                 
-                return util.format('```%s```', ret.join(', '));
+                return ret.join(', ');
             })
             .catch((err) => {
                 console.error("Error while retrieving event tags", err);
@@ -208,7 +208,7 @@ module.exports = class EventCalendar {
                 if (ret.length == 0)
                     ret.push('There is no moderator role for this server at the moment.');
 
-                return util.format('```%s```', ret.join(', '));
+                return ret.join(', ');
             })
             .catch((err) => {
                 console.error("Error while retrieving moderator role list", err);

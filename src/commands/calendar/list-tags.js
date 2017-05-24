@@ -20,6 +20,6 @@ module.exports = class DeleteEvent extends commando.Command {
 
     async run(msg, args) {
         const EventCalendar = this.client.EventCalendar;
-        return msg.channel.send(await EventCalendar.listActiveEventTags(msg.guild.id));
+        return msg.channel.send(await EventCalendar.listActiveEventTags(msg.guild.id), { code: true });
     }
 }
