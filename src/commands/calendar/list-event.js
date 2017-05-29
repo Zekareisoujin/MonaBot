@@ -39,6 +39,8 @@ module.exports = class ListEvent extends commando.Command {
         return msg.channel.send(await EventCalendar.listActiveEventsWithID(
             args[argTag],
             msg.guild.id
-        ));
+        ), {
+            code: 'Markdown'
+        });
     }
 }

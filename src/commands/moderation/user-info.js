@@ -31,7 +31,8 @@ module.exports = class UserInfoCommand extends commando.Command {
     }
 
     hasPermission(msg) {
-        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
+        const EventCalendar = this.client.EventCalendar;
+        return EventCalendar.hasModeratorPermission(msg.guild, msg.member) || this.client.isOwner(msg.author);
     }
 
     async run(msg, args) {

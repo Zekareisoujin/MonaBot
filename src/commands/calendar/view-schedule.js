@@ -40,6 +40,8 @@ module.exports = class ViewSchedule extends commando.Command {
         return msg.channel.send(await EventCalendar.listActiveEvents(
             args[argTag],
             msg.guild.id
-        ));
+        ), {
+            code: 'Markdown'
+        });
     }
 }
