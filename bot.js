@@ -29,6 +29,7 @@ client
     .on('debug', console.log)
     .on('ready', () => {
         console.log(`Client ready; logged in as ${client.user.username}#${client.user.discriminator} (${client.user.id})`);
+        client.user.setGame('You must be tired after today | Let’s go to sleep.')
     })
     .on('disconnect', () => { console.warn('Disconnected!'); })
     .on('reconnecting', () => { console.warn('Reconnecting...'); })
