@@ -75,6 +75,7 @@ client.EventCalendar = eventCalendar;
 client.registry
     .registerGroup('moderation', 'Moderation')
     .registerGroup('calendar', 'Calendar')
+    .registerGroup('misc', 'Miscellaneous')
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'src/commands'));
 
