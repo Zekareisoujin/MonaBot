@@ -160,14 +160,33 @@ module.exports = class EventCalendar {
     }
 
     /**
+     * Edit an event by its ID
+     * @return promise that resolve into reply string containing result
+     */
+    async updateEvent(id, field, value, guildId) {
+        const db = this.db;
+        return await Promise.resolve()
+            .then(() => {
+                return db.updateEvent(id, field, value, guildId);
+            })
+            .then(() => {
+                return "Event updated successfully!";
+            })
+            .catch((err) => {
+                console.error("Error while deleting event", err);
+                return "Failed to delete event: " + err;
+            })
+    }
+
+    /**
      * Remove an event by its ID
      * @return promise that resolve into reply string containing result
      */
-    async deleteEvent(id) {
-        const db = this.db
+    async deleteEvent(id, guildId) {
+        const db = this.db;
         return await Promise.resolve()
             .then(() => {
-                return db.deleteEvent(id);
+                return db.deleteEvent(id, guildId);
             })
             .then(() => {
                 return "Event deleted successfully!";

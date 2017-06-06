@@ -106,12 +106,27 @@ module.exports = class CalendarSequelize {
         return ret;
     }
 
-    async deleteEvent(id) {
-        return await this.Event.destroy({
-            where: {
-                id: id
-            }
-        });
+    async updateEvent(id, field, value, guild) {
+        return await this.Event.findById(id)
+            .then((event) => {
+                if (!event || event.guild != guild)
+                    return Promise.reject("Event does not exist.");
+
+                event[field] = value;
+                return event.save({
+                    fields: [field]
+                });
+            })
+    }
+
+    async deleteEvent(id, guild) {
+        return await this.Event.findById(id)
+            .then((event) => {
+                if (!event || event.guild != guild)
+                    return Promise.reject("Event does not exist.");
+
+                return event.destroy();
+            });
     }
 
     async addModerator(guild, role) {
