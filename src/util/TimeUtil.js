@@ -29,7 +29,7 @@ module.exports = class TimeUtil {
         if (!now) now = moment();
         let diff = moment.duration(moment(then).diff(now));
         let ret = [];
-        ['day', 'hour', 'minute', 'second'].forEach((denominator) => {
+        ['Year', 'Month', 'day', 'hour', 'minute', 'second'].forEach((denominator) => {
             if (diff.get(denominator) > 0)
                 ret.push(util.format(
                     '%d%s',
