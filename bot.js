@@ -1,7 +1,7 @@
 const commando = require('discord.js-commando');
 const path = require('path');
 const oneLine = require('common-tags').oneLine;
-const CalendarSequelize = require('./src/calendar/CalendarSequelize.js');
+const Sequelize = require('sequelize');
 const EventCalendar = require('./src/calendar/EventCalendar.js');
 
 let config
@@ -68,9 +68,17 @@ client
 //     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
 // ).catch(console.error);
 
-db = new CalendarSequelize(config.db);
-eventCalendar = new EventCalendar(db);
-client.EventCalendar = eventCalendar;
+var sequelizeClient = new Sequelize(config.db);
+sequelizeClient.authenticate()
+    .then(() => {
+        var eventCalendar = new EventCalendar(sequelizeClient);
+        client.EventCalendar = eventCalendar;
+    })
+    .catch((err) => {
+        console.error('Unable to initialize event calendar', err);
+        throw err;
+    });
+
 
 client.registry
     .registerGroup('moderation', 'Moderation')

@@ -1,13 +1,15 @@
 const util = require('util');
+const CalendarSequelize = require('./CalendarSequelize.js');
 const TimeUtil = require('../util/TimeUtil.js');
 
 module.exports = class EventCalendar {
 
     /**
-     * @param {EventCalendarDB} db
+     * @param {Sequelize} sequelizeClient
      */
-    constructor(db) {
-        this.db = db;
+    constructor(sequelizeClient) {
+        this.db = new CalendarSequelize(sequelizeClient);
+        const db = this.db;
         this.moderatorRoles = new Set();
         db.init()
             .then(() => {
@@ -17,7 +19,7 @@ module.exports = class EventCalendar {
                 roleList.forEach((role) => this.moderatorRoles.add(role.role));
             })
             .catch((err) => {
-                console.error('Unable to initialize database', err);
+                console.error('Unable to initialize calendar database', err);
                 throw err;
             });
     }
