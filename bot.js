@@ -3,6 +3,7 @@ const path = require('path');
 const oneLine = require('common-tags').oneLine;
 const Sequelize = require('sequelize');
 const EventCalendar = require('./src/calendar/EventCalendar.js');
+const PartyFinder = require('./src/party-finder/PartyFinder.js');
 
 let config
 try {
@@ -68,11 +69,34 @@ client
 //     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
 // ).catch(console.error);
 
+// Monkey patching
+const CommandMessage = require('discord.js-commando/src/commands/message.js');
+client.dispatcher.parseMessage = function(message) {
+    for(const commandList of this.registry.commands) {
+        const command = commandList[1];
+        if(!command.patterns) continue;
+        for(const pattern of command.patterns) {
+            const matches = pattern.exec(message.content);
+            if(matches) return new CommandMessage(message, command, null, matches);
+        }
+    }
+
+    // Find the command to run with default command handling
+    const prefix = message.guild ? message.guild.commandPrefix : this.client.commandPrefix;
+    if(!this._commandPatterns[prefix]) this.buildCommandPattern(prefix);
+    let cmdMsg = this.matchDefault(message, this._commandPatterns[prefix], 2);
+    if(!cmdMsg && !message.guild && !this.client.options.selfbot) cmdMsg = this.matchDefault(message, /^([^\s]+)/i);
+    return cmdMsg;
+}.bind(client.dispatcher);
+
+
 var sequelizeClient = new Sequelize(config.db);
 sequelizeClient.authenticate()
     .then(() => {
         var eventCalendar = new EventCalendar(sequelizeClient);
         client.EventCalendar = eventCalendar;
+        var partyFinder = new PartyFinder(sequelizeClient);
+        client.PartyFinder = partyFinder;
     })
     .catch((err) => {
         console.error('Unable to initialize event calendar', err);
@@ -83,6 +107,7 @@ sequelizeClient.authenticate()
 client.registry
     .registerGroup('moderation', 'Moderation')
     .registerGroup('calendar', 'Calendar')
+    .registerGroup('party-finder', 'Party Finder')
     .registerGroup('misc', 'Miscellaneous')
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'src/commands'));
