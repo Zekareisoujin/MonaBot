@@ -41,6 +41,7 @@ module.exports = class PartyFinder {
         const monitoredChannels = this.monitoredChannels;
 
         this.partyMemberDB = {};
+        this.monitoredPartyChannels = {};
         this.roleSpecs = ROLE_SPEC;
         this.TYPE_LFG = TYPE_LFG;
         this.TYPE_LFM = TYPE_LFM;
@@ -50,12 +51,24 @@ module.exports = class PartyFinder {
                 return db.fetchAllChannel();
             })
             .then((channelList) => {
-                channelList.forEach((channel) => monitoredChannels[channel.channel] = channel);
+                channelList.forEach((channel) => {
+                    monitoredChannels[channel.channel] = channel
+                    this.populatePartyChannelMonitor(channel);
+                });
             })
             .catch((err) => {
                 console.error('Unable to initialize party finder database', err);
                 throw err;
             });
+    }
+
+    populatePartyChannelMonitor(channel) {
+        for (var partyChannelId of channel.partyChannel) {
+            if (this.monitoredPartyChannels[partyChannelId] == undefined)
+                this.monitoredPartyChannels[partyChannelId] = [];
+            if (this.monitoredPartyChannels.indexOf(channel.channel) < 0)
+                this.monitoredPartyChannels.push(channel.channel);
+        }
     }
 
     /**
