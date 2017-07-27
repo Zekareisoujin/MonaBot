@@ -1,17 +1,15 @@
-const Sequelize = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 const TimeUtil = require('../util/TimeUtil.js');
 
 
 module.exports = class CalendarSequelize {
-    constructor(config) {
-        this.sequelize = new Sequelize(config);
+    constructor(sequelizeClient) {
+        this.sequelize = sequelizeClient;
     }
 
     async init() {
         const sequelize = this.sequelize;
-        await sequelize.authenticate();
         const dbSync = [];
 
         fs

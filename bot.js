@@ -1,8 +1,9 @@
 const commando = require('discord.js-commando');
 const path = require('path');
 const oneLine = require('common-tags').oneLine;
-const CalendarSequelize = require('./src/calendar/CalendarSequelize.js');
+const Sequelize = require('sequelize');
 const EventCalendar = require('./src/calendar/EventCalendar.js');
+const PartyFinder = require('./src/party-finder/PartyFinder.js');
 
 let config
 try {
@@ -68,13 +69,29 @@ client
 //     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
 // ).catch(console.error);
 
-db = new CalendarSequelize(config.db);
-eventCalendar = new EventCalendar(db);
-client.EventCalendar = eventCalendar;
+var sequelizeClient = new Sequelize(config.db);
+sequelizeClient.authenticate()
+    .then(() => {
+        var eventCalendar = new EventCalendar(sequelizeClient);
+        client.EventCalendar = eventCalendar;
+        var partyFinder = new PartyFinder(sequelizeClient);
+        client.PartyFinder = partyFinder;
+    })
+    .catch((err) => {
+        console.error('Unable to initialize event calendar', err);
+        throw err;
+    });
+
+// Separate message handler
+client
+    .on('message', function (message) {
+        this.PartyFinder.monitorPartyChannel(message);
+    }.bind(client));
 
 client.registry
     .registerGroup('moderation', 'Moderation')
     .registerGroup('calendar', 'Calendar')
+    .registerGroup('party-finder', 'Party Finder')
     .registerGroup('misc', 'Miscellaneous')
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'src/commands'));
