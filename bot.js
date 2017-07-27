@@ -82,6 +82,11 @@ sequelizeClient.authenticate()
         throw err;
     });
 
+// Separate message handler
+client
+    .on('message', function (message) {
+        this.PartyFinder.monitorPartyChannel(message);
+    }.bind(client));
 
 client.registry
     .registerGroup('moderation', 'Moderation')

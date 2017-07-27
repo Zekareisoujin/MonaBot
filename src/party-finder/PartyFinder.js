@@ -42,6 +42,7 @@ module.exports = class PartyFinder {
 
         this.partyMemberDB = {};
         this.monitoredPartyChannels = {};
+        this.pfUpdater = {};
         this.roleSpecs = ROLE_SPEC;
         this.TYPE_LFG = TYPE_LFG;
         this.TYPE_LFM = TYPE_LFM;
@@ -66,8 +67,8 @@ module.exports = class PartyFinder {
         for (var partyChannelId of channel.partyChannel) {
             if (this.monitoredPartyChannels[partyChannelId] == undefined)
                 this.monitoredPartyChannels[partyChannelId] = [];
-            if (this.monitoredPartyChannels.indexOf(channel.channel) < 0)
-                this.monitoredPartyChannels.push(channel.channel);
+            if (this.monitoredPartyChannels[partyChannelId].indexOf(channel.channel) < 0)
+                this.monitoredPartyChannels[partyChannelId].push(channel.channel);
         }
     }
 
@@ -174,6 +175,15 @@ module.exports = class PartyFinder {
     }
 
     /**
+     * refresh period in seconds
+     * 
+     * @param {Channel} channel 
+     */
+    getChannelRefreshRate(channel) {
+        return (this.monitoredChannels[channel.id].refreshPeriod);
+    }
+
+    /**
      * 
      * @param {User} user Discord JS User object
      * @param {Channel} channel Discord JS Channel object
@@ -187,7 +197,7 @@ module.exports = class PartyFinder {
         const now = (new Date()).getTime();
         const timeOutThreshold = now - channelConfig.timeOut * 1000;
         const userDB = this.partyMemberDB[channel.id];
-        const userKey = user.username;
+        const userKey = user.id;
 
         if (userDB[userKey] != undefined) {
             var userPF = userDB[userKey];
@@ -197,11 +207,15 @@ module.exports = class PartyFinder {
             userPF.type = type;
         } else {
             userDB[userKey] = {
+                name: user.username,
                 queueTime: now,
                 roleList: roleList,
                 type: type
             }
         }
+
+        if (this.pfUpdater[channel.id] != undefined)
+            this.pfUpdater[channel.id].update();
     }
 
 
@@ -220,6 +234,9 @@ module.exports = class PartyFinder {
                             return;
                     }
                     delete userDB[user.id];
+                    if (this.pfUpdater[pfChannelId] != undefined)
+                        this.pfUpdater[pfChannelId].update();
+                    console.log('Removing user ' + user.username + ' from PF');
                 }
             }
         }
@@ -244,12 +261,12 @@ module.exports = class PartyFinder {
 
             if (userPF.queueTime > timeOutThreshold) {
                 if (userPF.type == TYPE_LFM) {
-                    ret[TYPE_LFM].push(userId);
+                    ret[TYPE_LFM].push(userPF.name);
                 } else {
                     for (var role of userPF.roleList) {
                         if (ret[userPF.type][role] == undefined)
                             ret[userPF.type][role] = [];
-                        ret[userPF.type][role].push(userId);
+                        ret[userPF.type][role].push(userPF.name);
                     }
                 }
             }
