@@ -52,7 +52,7 @@ module.exports = class PartyFinder {
             })
             .then((channelList) => {
                 channelList.forEach((channel) => {
-                    monitoredChannels[channel.channel] = channel
+                    monitoredChannels[channel.channel] = channel;
                     this.populatePartyChannelMonitor(channel);
                 });
             })
@@ -200,6 +200,27 @@ module.exports = class PartyFinder {
                 queueTime: now,
                 roleList: roleList,
                 type: type
+            }
+        }
+    }
+
+
+    monitorPartyChannel(msg) {
+        const channel = msg.channel;
+        if (this.monitoredPartyChannels[channel.id] != undefined) {
+            // if this channel is being monitored
+            for (var pfChannelId of this.monitoredPartyChannels[channel.id]) {
+                // check against all PF channel that this party channel belongs to
+                const user = msg.author;
+                const userDB = this.partyMemberDB[pfChannelId];
+                if (userDB[user.id] != undefined) {
+                    if (userDB[user.id].type == TYPE_LFM) {
+                        // if the one LFG does not post a room number, keep him
+                        if (/^[0-9]{4,8}$/.exec(msg.content) == null)
+                            return;
+                    }
+                    delete userDB[user.id];
+                }
             }
         }
     }

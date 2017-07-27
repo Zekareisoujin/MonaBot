@@ -69,27 +69,6 @@ client
 //     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new commando.SQLiteProvider(db))
 // ).catch(console.error);
 
-// Monkey patching
-const CommandMessage = require('discord.js-commando/src/commands/message.js');
-client.dispatcher.parseMessage = function(message) {
-    for(const commandList of this.registry.commands) {
-        const command = commandList[1];
-        if(!command.patterns) continue;
-        for(const pattern of command.patterns) {
-            const matches = pattern.exec(message.content);
-            if(matches) return new CommandMessage(message, command, null, matches);
-        }
-    }
-
-    // Find the command to run with default command handling
-    const prefix = message.guild ? message.guild.commandPrefix : this.client.commandPrefix;
-    if(!this._commandPatterns[prefix]) this.buildCommandPattern(prefix);
-    let cmdMsg = this.matchDefault(message, this._commandPatterns[prefix], 2);
-    if(!cmdMsg && !message.guild && !this.client.options.selfbot) cmdMsg = this.matchDefault(message, /^([^\s]+)/i);
-    return cmdMsg;
-}.bind(client.dispatcher);
-
-
 var sequelizeClient = new Sequelize(config.db);
 sequelizeClient.authenticate()
     .then(() => {
