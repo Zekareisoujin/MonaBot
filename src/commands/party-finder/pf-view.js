@@ -103,10 +103,10 @@ module.exports = class PFView extends commando.Command {
 
         embed
             .addFieldFromList('Looking For More/Members', pflist[PartyFinder.TYPE_LFM])
-            .addFieldFromList('LFG - :attacker:Attacker', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.attack.name])
-            .addFieldFromList('LFG - :breaker:Breaker', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.break.name])
-            .addFieldFromList('LFG - :defender:Defender', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.defend.name])
-            .addFieldFromList('LFG - :support:Support', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.support.name])
+            .addFieldFromList('LFG - Attacker', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.attack.name])
+            .addFieldFromList('LFG - Breaker', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.break.name])
+            .addFieldFromList('LFG - Defender', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.defend.name])
+            .addFieldFromList('LFG - Support', pflist[PartyFinder.TYPE_LFG][PartyFinder.roleSpecs.support.name])
 
         return embed;
     }
