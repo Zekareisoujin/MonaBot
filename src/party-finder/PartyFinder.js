@@ -41,11 +41,13 @@ module.exports = class PartyFinder {
         const monitoredChannels = this.monitoredChannels;
 
         this.partyMemberDB = {};
+        const partyMemberDB = this.partyMemberDB;
         this.monitoredPartyChannels = {};
         this.pfUpdater = {};
         this.roleSpecs = ROLE_SPEC;
         this.TYPE_LFG = TYPE_LFG;
         this.TYPE_LFM = TYPE_LFM;
+        const populatePartyChannelMonitor = this.populatePartyChannelMonitor;
 
         db.init()
             .then(() => {
@@ -54,7 +56,8 @@ module.exports = class PartyFinder {
             .then((channelList) => {
                 channelList.forEach((channel) => {
                     monitoredChannels[channel.channel] = channel;
-                    this.populatePartyChannelMonitor(channel);
+                    partyMemberDB[channel.channel] = {};
+                    populatePartyChannelMonitor(channel);
                 });
             })
             .catch((err) => {
@@ -191,9 +194,6 @@ module.exports = class PartyFinder {
      * @param {Array} roleList Array of roles requested
      */
     updateUser(user, channel, roleList, type) {
-        if (this.partyMemberDB[channel.id] == undefined)
-            this.partyMemberDB[channel.id] = {};
-
         const channelConfig = this.monitoredChannels[channel.id];
         const now = (new Date()).getTime();
         const timeOutThreshold = now - channelConfig.timeOut * 1000;
