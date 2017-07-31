@@ -231,9 +231,6 @@ module.exports = class PartyFinder {
      * @param {Array} roleList Array of roles requested
      */
     updateUser(user, channel, roleList, type) {
-        // if (this.partyMemberDB[channel.id] == undefined)
-        //     this.partyMemberDB[channel.id] = {};
-
         const channelConfig = this.monitoredChannels[channel.id];
         const now = (new Date()).getTime();
         const timeOutThreshold = now - channelConfig.timeOut * 1000;
