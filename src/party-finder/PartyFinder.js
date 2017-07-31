@@ -92,6 +92,7 @@ module.exports = class PartyFinder {
             })
             .then((pfChannel) => {
                 channelList[pfChannel.channel] = pfChannel;
+                pfChannel.partyChannel = [];
                 return "Channel registered successfully.";
             })
             .catch((err) => {
@@ -214,8 +215,10 @@ module.exports = class PartyFinder {
             }
         }
 
-        if (this.pfUpdater[channel.id] != undefined)
+        if (this.pfUpdater[channel.id] != undefined) {
             this.pfUpdater[channel.id].update();
+            this.pfUpdater[channel.id].replaceRequired = true;
+        }
     }
 
 
@@ -234,8 +237,10 @@ module.exports = class PartyFinder {
                             return;
                     }
                     delete userDB[user.id];
-                    if (this.pfUpdater[pfChannelId] != undefined)
+                    if (this.pfUpdater[pfChannelId] != undefined) {
                         this.pfUpdater[pfChannelId].update();
+                        this.pfUpdater[pfChannelId].replaceRequired = true;
+                    }
                     console.log('Removing user ' + user.username + ' from PF');
                 }
             }

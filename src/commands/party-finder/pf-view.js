@@ -66,7 +66,10 @@ module.exports = class PFView extends commando.Command {
     }
 
     runPFUpdater() {
-        this.replace();
+        if (this.replaceRequired)
+            this.replace();
+        else
+            this.update();
     }
 
     async replacePFMessage() {
@@ -75,6 +78,7 @@ module.exports = class PFView extends commando.Command {
             var deletedMsg = await this.message.delete();
         }
         this.message = await this.channel.send({embed});
+        this.replaceRequired = false;
     }
 
     async updatePFMessage() {
@@ -89,7 +93,7 @@ module.exports = class PFView extends commando.Command {
 
         const embed = new RichEmbed()
             .setTitle('Party Finder')
-            .setDescription('Typing lfg/lfm to be registered here.')
+            .setDescription('Type lfg/lfm (with roles) to be registered here.')
             .setColor(13737291)
             .setTimestamp(new Date());
 
