@@ -1,5 +1,5 @@
 const commando = require('discord.js-commando');
-const RichEmbed = require('discord.js').RichEmbed;
+const MessageEmbed = require('discord.js').MessageEmbed;
 
 const argKey = 'user';
 
@@ -39,8 +39,9 @@ module.exports = class UserInfoCommand extends commando.Command {
         const member = args[argKey];
         const user = member.user;
         const EventCalendar = this.client.EventCalendar;
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setAuthor(user.username)
+            .setImage(user.avatarURL)
             .setThumbnail(user.avatarURL)
             .addField('ID', user.id)
             .addField('Nickname', member.nickname ? member.nickname : 'None')
