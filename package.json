@@ -16,7 +16,7 @@
   },
   "license": "BSD-3-Clause",
   "dependencies": {
-    "discord.js": "^11.1.0",
+    "discord.js": "hydrabolt/discord.js",
     "discord.js-commando": "Gawdl3y/discord.js-commando",
     "moment-timezone": "^0.5.13",
     "pg": "^6.2.2",

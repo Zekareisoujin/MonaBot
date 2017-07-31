@@ -1,5 +1,5 @@
 const commando = require('discord.js-commando');
-const RichEmbed = require('discord.js').RichEmbed;
+const MessageEmbed = require('discord.js').MessageEmbed;
 
 const subCmdEnum = {
     START: 'start',
@@ -91,7 +91,7 @@ module.exports = class PFView extends commando.Command {
     queryPFInfo(PartyFinder, channel) {
         var pflist = PartyFinder.retrievePFUsers(channel);
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle('Party Finder')
             .setDescription('Type lfg/lfm (with roles) to be registered here.')
             .setColor(13737291)

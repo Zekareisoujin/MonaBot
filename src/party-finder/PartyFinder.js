@@ -36,28 +36,25 @@ module.exports = class PartyFinder {
      */
     constructor(sequelizeClient) {
         this.db = new PFSequelize(sequelizeClient);
-        const db = this.db;
         this.monitoredChannels = {};
-        const monitoredChannels = this.monitoredChannels;
-
-        this.partyMemberDB = {};
-        const partyMemberDB = this.partyMemberDB;
         this.monitoredPartyChannels = {};
+        this.partyMemberDB = {};
         this.pfUpdater = {};
+
         this.roleSpecs = ROLE_SPEC;
         this.TYPE_LFG = TYPE_LFG;
         this.TYPE_LFM = TYPE_LFM;
         const populatePartyChannelMonitor = this.populatePartyChannelMonitor;
 
-        db.init()
+        this.db.init()
             .then(() => {
-                return db.fetchAllChannel();
+                return this.db.fetchAllChannel();
             })
             .then((channelList) => {
                 channelList.forEach((channel) => {
-                    monitoredChannels[channel.channel] = channel;
-                    partyMemberDB[channel.channel] = {};
-                    populatePartyChannelMonitor(channel);
+                    this.monitoredChannels[channel.channel] = channel;
+                    this.partyMemberDB[channel.channel] = {};
+                    this.populatePartyChannelMonitor(channel);
                 });
             })
             .catch((err) => {
@@ -66,13 +63,45 @@ module.exports = class PartyFinder {
             });
     }
 
-    populatePartyChannelMonitor(channel) {
-        for (var partyChannelId of channel.partyChannel) {
-            if (this.monitoredPartyChannels[partyChannelId] == undefined)
-                this.monitoredPartyChannels[partyChannelId] = [];
-            if (this.monitoredPartyChannels[partyChannelId].indexOf(channel.channel) < 0)
-                this.monitoredPartyChannels[partyChannelId].push(channel.channel);
+    /**
+     * 
+     * @param {PFChannel} pfChannel 
+     * @param {String} partyChannelId 
+     */
+    populatePartyChannelMonitor(pfChannel, partyChannelId) {
+        if (partyChannelId == undefined) {
+            for (var partyChannelId of pfChannel.partyChannel) {
+                this.addPartyChannelMonitor(pfChannel.channel, partyChannelId);
+            }
+        } else {
+            this.addPartyChannelMonitor(pfChannel.channel, partyChannelId);
         }
+    }
+
+    /**
+     * 
+     * @param {String} pfChannelId 
+     * @param {String} partyChannelId 
+     */
+    addPartyChannelMonitor(pfChannelId, partyChannelId) {
+        if (this.monitoredPartyChannels[partyChannelId] == undefined)
+            this.monitoredPartyChannels[partyChannelId] = [];
+        if (this.monitoredPartyChannels[partyChannelId].indexOf(pfChannelId) < 0)
+            this.monitoredPartyChannels[partyChannelId].push(pfChannelId);
+    }
+
+    /**
+     * 
+     * @param {PFChannel} pfChannel 
+     */
+    clearPartyChannelMonitor(pfChannel) {
+        for (var partyChannelId of pfChannel.partyChannel) {
+            const channelList = this.monitoredPartyChannels[partyChannelId];
+            if (channelList != undefined && channelList.indexOf(pfChannel.channel) >= 0) {
+                channelList.splice(channelList.indexOf(pfChannel.channel), 1);
+            }
+        }
+        pfChannel.partyChannel = [];
     }
 
     /**
@@ -82,7 +111,6 @@ module.exports = class PartyFinder {
      * @param {int} [opts_refreshPeriod] Refresh period in seconds.
      */
     async registerChannel(channel, opts_timeOut, opts_refreshPeriod) {
-        const db = this.db;
         const channelList = this.monitoredChannels;
         if (channelList[channel.id] != undefined)
             return "This channel has already been registered.";
@@ -91,7 +119,7 @@ module.exports = class PartyFinder {
         var refreshPeriod = (opts_refreshPeriod == undefined ? DEFAULT_REFRESH_PERIOD : opts_refreshPeriod);
         return await Promise.resolve(channel)
             .then(() => {
-                return db.registerPFChannel(channel.id, [], timeOut, refreshPeriod)
+                return this.db.registerPFChannel(channel.id, [], timeOut, refreshPeriod)
             })
             .then((pfChannel) => {
                 channelList[pfChannel.channel] = pfChannel;
@@ -109,14 +137,13 @@ module.exports = class PartyFinder {
      * @param {Channel} channel Discord JS Channel object
      */
     async deregisterChannel(channel) {
-        const db = this.db;
         const channelList = this.monitoredChannels;
         if (channelList[channel.id] == undefined)
             return "This channel has not yet been registered.";
 
         return await Promise.resolve(channel)
             .then(() => {
-                db.removePFChannel(channel.id)
+                this.db.removePFChannel(channel.id)
             })
             .then(() => {
                 delete channelList[channel.id];
@@ -128,8 +155,12 @@ module.exports = class PartyFinder {
             })
     }
 
+    /**
+     * 
+     * @param {Channel} pfChannel 
+     * @param {Channel} partyChannel 
+     */
     async addPartyChannel(pfChannel, partyChannel) {
-        const db = this.db;
         const channelList = this.monitoredChannels;
         if (channelList[pfChannel.id] == undefined)
             return "This channel has not yet been registered.";
@@ -139,7 +170,10 @@ module.exports = class PartyFinder {
             partyChannelList.push(partyChannel.id);
             return await Promise.resolve()
                 .then(() => {
-                    db.updatePFChannel(pfChannel.id, 'partyChannel', partyChannelList);
+                    this.db.updatePFChannel(pfChannel.id, 'partyChannel', partyChannelList);
+                })
+                .then(() => {
+                    this.addPartyChannelMonitor(pfChannel.id, partyChannel.id);
                 })
                 .catch((err) => {
                     partyChannelList.splice(partyChannelList.indexOf(partyChannel.id), 1);
@@ -150,18 +184,22 @@ module.exports = class PartyFinder {
             return "This party channel has already been added.";
     }
 
+    /**
+     * 
+     * @param {Channel} pfChannel 
+     */
     async clearPartyChannel(pfChannel) {
-        const db = this.db;
         const channelList = this.monitoredChannels;
         if (channelList[pfChannel.id] == undefined)
             return "This channel has not yet been registered.";
 
         return await Promise.resolve()
             .then(() => {
-                db.updatePFChannel(pfChannel.id, 'partyChannel', []);
+                this.db.updatePFChannel(pfChannel.id, 'partyChannel', []);
             })
             .then(() => {
-                channelList[pfChannel.id].partyChannel = [];
+                this.clearPartyChannelMonitor(channelList[pfChannel.id]);
+                //channelList[pfChannel.id].partyChannel = [];
                 return "Party channels cleared.";
             })
             .catch((err) => {
@@ -221,7 +259,10 @@ module.exports = class PartyFinder {
         }
     }
 
-
+    /**
+     * 
+     * @param {Message} msg 
+     */
     monitorPartyChannel(msg) {
         const channel = msg.channel;
         if (this.monitoredPartyChannels[channel.id] != undefined) {
