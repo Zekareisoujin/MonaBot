@@ -9,11 +9,12 @@ module.exports = class EventCalendar {
      */
     constructor(sequelizeClient) {
         this.db = new CalendarSequelize(sequelizeClient);
-        const db = this.db;
         this.moderatorRoles = new Set();
-        db.init()
+        this.messageList = {};
+
+        this.db.init()
             .then(() => {
-                return db.listAllModerators();
+                return this.db.listAllModerators();
             })
             .then((roleList) => {
                 roleList.forEach((role) => this.moderatorRoles.add(role.role));
@@ -34,16 +35,15 @@ module.exports = class EventCalendar {
      * @return promise that resolve into reply string containing result
      */
     async createEvent(content, tag, guildId, startTime, endTime) {
-        const db = this.db
         return await Promise.resolve()
             .then(() => {
                 // TODO: handle time error, or throw exception from time util
                 let startDateTime = TimeUtil.getTimeObject(startTime);
                 if (endTime && endTime.length > 0) {
                     let endDateTime = TimeUtil.getTimeObject(endTime);
-                    return db.createEvent(content, tag, guildId, startDateTime, endDateTime);
+                    return this.db.createEvent(content, tag, guildId, startDateTime, endDateTime);
                 } else
-                    return db.createEvent(content, tag, guildId, startDateTime);
+                    return this.db.createEvent(content, tag, guildId, startDateTime);
             })
             .then(() => {
                 return "Event created successfully!"; //TODO: insert 👌
@@ -61,10 +61,9 @@ module.exports = class EventCalendar {
      * @return promise that resolve into formatted reply string listing all active events & their ID
      */
     async listActiveEventsWithID(tag, guildId) {
-        const db = this.db;
         return await Promise.all([
-            db.fetchUpcomingEvents(tag, guildId),
-            db.fetchOngoingEvents(tag, guildId)
+            this.db.fetchUpcomingEvents(tag, guildId),
+            this.db.fetchOngoingEvents(tag, guildId)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
 
@@ -98,10 +97,9 @@ module.exports = class EventCalendar {
      * @return promise that resolve into formatted reply string listing all active events
      */
     async listActiveEvents(tag, guildId) {
-        const db = this.db;
         return await Promise.all([
-            db.fetchUpcomingEvents(tag, guildId),
-            db.fetchOngoingEvents(tag, guildId)
+            this.db.fetchUpcomingEvents(tag, guildId),
+            this.db.fetchOngoingEvents(tag, guildId)
         ]).then(([upcoming, ongoing]) => {
             let ret = [];
 
@@ -166,10 +164,9 @@ module.exports = class EventCalendar {
      * @return promise that resolve into reply string containing result
      */
     async updateEvent(id, field, value, guildId) {
-        const db = this.db;
         return await Promise.resolve()
             .then(() => {
-                return db.updateEvent(id, field, value, guildId);
+                return this.db.updateEvent(id, field, value, guildId);
             })
             .then(() => {
                 return "Event updated successfully!";
@@ -185,10 +182,9 @@ module.exports = class EventCalendar {
      * @return promise that resolve into reply string containing result
      */
     async deleteEvent(id, guildId) {
-        const db = this.db;
         return await Promise.resolve()
             .then(() => {
-                return db.deleteEvent(id, guildId);
+                return this.db.deleteEvent(id, guildId);
             })
             .then(() => {
                 return "Event deleted successfully!";
@@ -200,10 +196,9 @@ module.exports = class EventCalendar {
     }
 
     async addModerator(guildId, roleId) {
-        const db = this.db;
         return await Promise.resolve()
             .then(() => {
-                return db.addModerator(guildId, roleId);
+                return this.db.addModerator(guildId, roleId);
             })
             .then(() => {
                 this.moderatorRoles.add(roleId);
@@ -217,10 +212,9 @@ module.exports = class EventCalendar {
     }
 
     async listModerators(guild) {
-        const db = this.db;
         return await Promise.resolve()
             .then(() => {
-                return db.listModerators(guild.id);
+                return this.db.listModerators(guild.id);
             })
             .then((moderatorRoleList) => {
                 let ret = [];
@@ -238,10 +232,9 @@ module.exports = class EventCalendar {
     }
 
     async removeModerator(guildId, roleId) {
-        const db = this.db
         return await Promise.resolve()
             .then(() => {
-                return db.removeModerator(guildId, roleId);
+                return this.db.removeModerator(guildId, roleId);
             })
             .then(() => {
                 this.moderatorRoles.delete(roleId);
@@ -269,5 +262,16 @@ module.exports = class EventCalendar {
         })
 
         return member.hasPermission('ADMINISTRATOR') || hasPermission;
+    }
+
+    getLatestMessage(channel) {
+        if (this.messageList[channel.id] != undefined)
+            return this.messageList[channel.id];
+        else
+            return null;
+    }
+
+    setLatestMessage(channel, message) {
+        this.messageList[channel.id] = message;
     }
 }

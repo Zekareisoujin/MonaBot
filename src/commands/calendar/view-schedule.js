@@ -37,11 +37,19 @@ module.exports = class ViewSchedule extends commando.Command {
 
     async run(msg, args) {
         const EventCalendar = this.client.EventCalendar;
-        return msg.channel.send(await EventCalendar.listActiveEvents(
+        
+        var oldMessage = EventCalendar.getLatestMessage(msg.channel);
+        if (oldMessage != null)
+            await oldMessage.delete();
+        
+        var newMessage = await msg.channel.send(await EventCalendar.listActiveEvents(
             args[argTag],
             msg.guild.id
         ), {
             code: 'Markdown'
         });
+        EventCalendar.setLatestMessage(msg.channel, newMessage);
+
+        return newMessage;
     }
 }
