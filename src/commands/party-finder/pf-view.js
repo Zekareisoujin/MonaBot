@@ -84,7 +84,12 @@ module.exports = class PFView extends commando.Command {
     async updatePFMessage() {
         var embed = this.query(this.PartyFinder, this.channel);
         if (this.message != undefined) {
-            this.message = await this.message.edit({embed});
+            try {
+                this.message = await this.message.edit({embed});
+            } catch (e) {
+                console.log('Failed to edit PF message: ' + e);
+                this.message = await this.channel.send({embed});
+            }
         }
     }
 
