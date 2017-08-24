@@ -39,8 +39,13 @@ module.exports = class ViewSchedule extends commando.Command {
         const EventCalendar = this.client.EventCalendar;
         
         var oldMessage = EventCalendar.getLatestMessage(msg.channel);
-        if (oldMessage != null)
-            await oldMessage.delete();
+
+        try {
+            if (oldMessage != null)
+                await oldMessage.delete();
+        } catch(e) {
+            console.log('Cannot delete old message: ' + e);
+        }
         
         var newMessage = await msg.channel.send(await EventCalendar.listActiveEvents(
             args[argTag],
