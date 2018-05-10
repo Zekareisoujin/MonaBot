@@ -22,7 +22,7 @@ module.exports = class ViewSchedule extends commando.Command {
             'guildOnly': true,
             'throttling': {
                 'usages': 1,
-                'duration': 30
+                'duration': 15
             },
             'args': [
                 {
