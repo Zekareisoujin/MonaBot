@@ -3,7 +3,7 @@
   "description": "Discord Bot Sandbox",
   "version": "1.0.0",
   "engines": {
-    "node": ">=7.10.0",
+    "node": ">=8.11.1",
     "npm": ">=4.2.0"
   },
   "author": {
@@ -21,7 +21,9 @@
     "moment-timezone": "^0.5.13",
     "pg": "^6.2.2",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^3.30.4",
+    "sequelize": "^3.30.4"
+  },
+  "devDependencies": {
     "sqlite3": "^3.1.8"
   },
   "scripts": {
