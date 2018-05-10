@@ -4,6 +4,7 @@ const oneLine = require('common-tags').oneLine;
 const Sequelize = require('sequelize');
 const EventCalendar = require('./src/calendar/EventCalendar.js');
 const PartyFinder = require('./src/party-finder/PartyFinder.js');
+const SeedCalendar = require('./src/calendar/SeedCalendar.js');
 
 let config
 try {
@@ -76,6 +77,7 @@ sequelizeClient.authenticate()
         client.EventCalendar = eventCalendar;
         var partyFinder = new PartyFinder(sequelizeClient);
         client.PartyFinder = partyFinder;
+        client.SeedCalendar = new SeedCalendar();
     })
     .catch((err) => {
         console.error('Unable to initialize event calendar', err);
@@ -92,6 +94,7 @@ client.registry
     .registerGroup('moderation', 'Moderation')
     .registerGroup('calendar', 'Calendar')
     .registerGroup('party-finder', 'Party Finder')
+    .registerGroup('mobius', 'Mobius')
     .registerGroup('misc', 'Miscellaneous')
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'src/commands'));
