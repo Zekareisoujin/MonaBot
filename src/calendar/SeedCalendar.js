@@ -24,12 +24,15 @@ module.exports = class SeedCalendar {
 
     /**
      * 
-     * @param {String} selectedDateString
+     * @param {string} selectedDateString
      */
     getSeedRotation(selectedDateString) {
         var selectedDate = new Date(selectedDateString);
+        if (selectedDate.toString() === 'Invalid Date')
+            throw selectedDate;
+
         var timeDiff = Math.abs(selectedDate.getTime() - this.baseDate.getTime());
-        var diffInDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        var diffInDays = Math.floor(timeDiff / (1000 * 3600 * 24));
         var actualIndex = (this.baseIndex + diffInDays) % this.seedRotation.length;
         var seedRotation1 = [], seedRotation2 = [];
         for (var i=0; i<this.boostStat.length; i++) {
