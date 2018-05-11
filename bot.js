@@ -31,8 +31,9 @@ client
     .on('debug', console.log)
     .on('ready', () => {
         console.log(`Client ready; logged in as ${client.user.username}#${client.user.discriminator} (${client.user.id})`);
-        client.user.setActivity({
-            name: 'You must be tired after today | Let’s go to sleep.'
+        client.user.setActivity('You must be tired after today | Let’s go to sleep.', {
+            url: 'https://youtu.be/eFVj0Z6ahcI?t=46',
+            type: 'STREAMING'
         });
     })
     .on('disconnect', () => { console.warn('Disconnected!'); })
