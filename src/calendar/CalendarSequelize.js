@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const TimeUtil = require('../util/TimeUtil.js');
-const Sequelize = require('Sequelize');
+const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 module.exports = class CalendarSequelize {
