@@ -35,7 +35,6 @@ module.exports = class SayCommand extends commando.Command {
     async run(msg, args) {
         msg.delete()
             .then(() => {
-                console.log(args[argMsgId]);
                 const message = args[argMsgId];
                 const author = message.author.username + '#' + message.author.discriminator;
                 const channel = '#' + message.channel.name;
