@@ -21,10 +21,10 @@
     "moment-timezone": "^0.5.13",
     "pg": "^6.2.2",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^3.30.4"
+    "sequelize": "^5.3.0"
   },
   "devDependencies": {
-    "sqlite3": "^3.1.8"
+    "sqlite3": "^4.0.9"
   },
   "scripts": {
     "start": "node --harmony bot.js"
