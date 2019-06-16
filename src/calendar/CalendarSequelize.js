@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const TimeUtil = require('../util/TimeUtil.js');
-
+const Sequelize = require('Sequelize');
+const Op = Sequelize.Op;
 
 module.exports = class CalendarSequelize {
     constructor(sequelizeClient) {
@@ -48,7 +49,7 @@ module.exports = class CalendarSequelize {
                 tag: tag,
                 guild: guild,
                 start_time: {
-                    $gte: TimeUtil.getTimeObject()
+                    [Op.gte]: TimeUtil.getTimeObject()
                 }
             },
             order: ['start_time']
@@ -62,10 +63,10 @@ module.exports = class CalendarSequelize {
                 tag: tag,
                 guild: guild,
                 start_time: {
-                    $lt: now
+                    [Op.lt]: now
                 },
                 end_time: {
-                    $gte: now
+                    [Op.gte]: now
                 }
             },
             order: ['end_time']
@@ -78,14 +79,14 @@ module.exports = class CalendarSequelize {
             attributes: ['tag'],
             where: {
                 guild: guild,
-                $or: [
+                [Op.or]: [
                     {
                         start_time: {
-                            $gte: now
+                            [Op.gte]: now
                         }
                     }, {
                         end_time: {
-                            $gte: now
+                            [Op.gte]: now
                         }
                     }
                 ]
