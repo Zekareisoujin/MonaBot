@@ -22,7 +22,7 @@ module.exports = class SayCommand extends commando.Command {
                     'key': argMsgId,
                     'label': 'messageId',
                     'prompt': 'Specify message ID that Mona should quote.',
-                    'type': 'message',
+                    'type': 'string',
                 }
             ]
         });
@@ -35,7 +35,15 @@ module.exports = class SayCommand extends commando.Command {
     async run(msg, args) {
         msg.delete()
             .then(() => {
-                const message = args[argMsgId];
+                const messageId = args[argMsgId];
+                return msg.channel.messages.fetch(messageId).catch(() => {
+                    return null;
+                });
+            })
+            .then((message) => {
+                if (message == null) {
+                    return msg.channel.send("Invalid message ID");
+                }
                 const author = message.author.username + '#' + message.author.discriminator;
                 const channel = '#' + message.channel.name;
                 const embed = new MessageEmbed()
