@@ -46,22 +46,31 @@ module.exports = class SeedSchedule extends commando.Command {
         }
 
         var schedule = SeedCalendar.getSeedRotation(args[argDate]);
-        var dateString = schedule.date.getFullYear() + '-' + (schedule.date.getMonth() + 1) + '-' + schedule.date.getDate();
-        var sb1 = [], sb2 = [];
-        
-        for (var i=0; i<schedule.stat.length; i++) {
-            sb1.push('- ' + schedule.stat[i] + ': < ' + schedule.seedRotation[0][i] + ' >');
-            sb2.push('- ' + schedule.stat[i] + ': < ' + schedule.seedRotation[1][i] + ' >');
-        }
+        var messageContent;
 
-        var messageContent = 
-            'Weapon Boost seed requirements for ' + dateString + ': \n' +
-            '```markdown\n' + 
-            '# Before 16:00 UTC-8:\n' +
-            sb1.join('\n') + 
-            '\n# After 16:00 UTC-8:\n' +
-            sb2.join('\n') + 
-            '```';
+        if (schedule.hasError) {
+            if (schedule.errorMsg !== '')
+                messageContent = schedule.errorMsg;
+            else
+                messageContent = 'There was a little problem...';
+        }else {
+            var dateString = schedule.date.getFullYear() + '-' + (schedule.date.getMonth() + 1) + '-' + schedule.date.getDate();
+            var sb1 = [], sb2 = [];
+            
+            for (var i=0; i<schedule.stat.length; i++) {
+                sb1.push('- ' + schedule.stat[i] + ': < ' + schedule.seedRotation[0][i] + ' >');
+                sb2.push('- ' + schedule.stat[i] + ': < ' + schedule.seedRotation[1][i] + ' >');
+            }
+
+            messageContent = 
+                'Weapon Boost seed requirements for ' + dateString + ': \n' +
+                '```markdown\n' + 
+                '# Before 16:00 UTC-8:\n' +
+                sb1.join('\n') + 
+                '\n# After 16:00 UTC-8:\n' +
+                sb2.join('\n') + 
+                '```';
+        }
         
         var newMessage = await msg.channel.send(messageContent);
         SeedCalendar.setLatestMessage(msg.channel, newMessage);

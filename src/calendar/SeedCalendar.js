@@ -10,7 +10,7 @@ const BOOST_STAT = [
 ]
 
 const BASE_DATE = new Date('2018-05-11');
-const BASE_IDX = 3;
+const BASE_IDX = 4;
 
 module.exports = class SeedCalendar {
 
@@ -29,7 +29,10 @@ module.exports = class SeedCalendar {
     getSeedRotation(selectedDateString) {
         var selectedDate = new Date(selectedDateString);
         if (selectedDate.toString() === 'Invalid Date')
-            throw selectedDate;
+            return {
+                hasError: true,
+                errorMsg: selectedDate.toString()
+            }
 
         var timeDiff = Math.abs(selectedDate.getTime() - this.baseDate.getTime());
         var diffInDays = Math.floor(timeDiff / (1000 * 3600 * 24));
@@ -42,7 +45,8 @@ module.exports = class SeedCalendar {
         return {
             date: selectedDate,
             stat: this.boostStat,
-            seedRotation: [seedRotation1, seedRotation2]
+            seedRotation: [seedRotation1, seedRotation2],
+            hasError: false
         };
     }
 
