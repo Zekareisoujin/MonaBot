@@ -106,7 +106,7 @@ module.exports = class CalendarSequelize {
     }
 
     async updateEvent(id, field, value, guild) {
-        return await this.Event.findById(id)
+        return await this.Event.findByPk(id)
             .then((event) => {
                 if (!event || event.guild != guild)
                     return Promise.reject("Event does not exist.");
@@ -119,7 +119,7 @@ module.exports = class CalendarSequelize {
     }
 
     async deleteEvent(id, guild) {
-        return await this.Event.findById(id)
+        return await this.Event.findByPk(id)
             .then((event) => {
                 if (!event || event.guild != guild)
                     return Promise.reject("Event does not exist.");
