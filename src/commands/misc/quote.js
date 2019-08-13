@@ -1,5 +1,5 @@
 const commando = require('discord.js-commando');
-const MessageEmbed = require('discord.js').MessageEmbed;
+const RichEmbed = require('discord.js').RichEmbed;
 
 const argMsgId = 'content';
 
@@ -33,28 +33,43 @@ module.exports = class SayCommand extends commando.Command {
     }
 
     async run(msg, args) {
-        msg.delete()
-            .then(() => {
-                const messageId = args[argMsgId];
-                return msg.channel.messages.fetch(messageId).catch(() => {
-                    return null;
-                });
-            })
-            .then((message) => {
-                if (message == null) {
-                    return msg.channel.send("Invalid message ID");
+        const quoteInput = args[argMsgId].split('-');
+        var retPromise;
+        if (quoteInput.length == 1) {
+            retPromise = msg.channel.fetchMessage(quoteInput[0]);
+        }else {
+            var channel = msg.guild.channels.get(quoteInput[0]);
+            if (channel == undefined) {
+                channel = {
+                    fetchMessage: function() {
+                        return Promise.reject();
+                    }
                 }
+            }
+            retPromise = channel.fetchMessage(quoteInput[1]);
+        }
+        //return msg.channel.fetchMessage(messageId)
+        return retPromise
+            .then(message => {
                 const author = message.author.username + '#' + message.author.discriminator;
                 const channel = '#' + message.channel.name;
-                const embed = new MessageEmbed()
-                    .setAuthor(author + ' in ' + channel, message.author.avatarURL())
+                const attachment = message.attachments.first();
+                console.log(message.attachments);
+                console.log(attachment);
+                const embed = new RichEmbed()
+                    .setAuthor(author + ' in ' + channel, message.author.displayAvatarURL)
                     .setDescription(message.content)
-                    .setTimestamp(new Date(message.createdTimestamp));
+                    .setTimestamp(new Date(message.createdTimestamp))
+                    .setImage(attachment ? attachment.url : '')
+                    .setURL(message.url);
+                
+                msg.delete(10000)
                 return msg.channel.send({embed});
             })
-            .catch((err) => {
-                console.error(err);
-                // do nothing, pretends that the bot does not know that it doesn't have the permission
-            });
+            .catch(() => {
+                const reply = msg.channel.send("Invalid message ID")
+                reply.then(rep => rep.delete(5000))
+                return reply;
+            })
     }
 }
